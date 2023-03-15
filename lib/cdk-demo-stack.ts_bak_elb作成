@@ -1,0 +1,97 @@
+// import {
+//   aws_ecr,
+//   aws_codepipeline,
+// } from 'aws-cdk-lib'
+// import * as cdk from '@aws-cdk/core';
+// import { Vpc, SubnetType } from '@aws-cdk/aws-ec2';
+// import { Repository } from '@aws-cdk/aws-ecr';
+
+// export class CdkDemoStack extends cdk.Stack {
+//   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+//     super(scope, id, props);
+
+//     const vpc = new Vpc(this, 'MainVpc', {
+//       maxAzs: 2,
+//       subnetConfiguration: [
+//         {
+//           cidrMask: 24,
+//           name: 'public-subnet',
+//           subnetType: SubnetType.PUBLIC
+//         },
+//       ]
+//     });
+
+//     const demoEcr = new Repository(this, 'DemoEcr');
+
+//     const demoPipeline = new aws_codepipeline.Pipeline(this, 'DemoPipeline');
+//   }
+// }
+
+import {
+  aws_certificatemanager,
+  aws_ec2,
+  aws_elasticloadbalancingv2,
+  Duration,
+  Stack,
+  StackProps,
+} from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+/**
+ * ALBを作るスタック
+ */
+export class AlbStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
+    super(scope, id, props);
+
+    // 既存のVPCを調べる
+    const vpc = aws_ec2.Vpc.fromLookup(this, 'vpc', { vpcName: 'udemy' });
+
+    // 自動生成されるセキュリティグループには問題があるため
+    // セキュリティグループを作成する
+    const albSecurityGroup = new aws_ec2.SecurityGroup(this, 'albSecurityGroup', {
+      allowAllOutbound: true,
+      securityGroupName: 'alb-sg',
+      vpc,
+    });
+    albSecurityGroup.addIngressRule(aws_ec2.Peer.anyIpv4(), aws_ec2.Port.tcp(80));
+    albSecurityGroup.addIngressRule(aws_ec2.Peer.anyIpv4(), aws_ec2.Port.tcp(443));
+        // ALBを作成する
+    const alb = new aws_elasticloadbalancingv2.ApplicationLoadBalancer(this, 'alb', {
+      internetFacing: true,
+      loadBalancerName: 'alb',
+      vpc,
+      vpcSubnets: { subnets: vpc.publicSubnets },
+    });
+
+    // ALBのターゲットグループを作成する
+    const targetGroup = new aws_elasticloadbalancingv2.ApplicationTargetGroup(this, 'targetGroup', {
+      healthCheck: {
+        healthyHttpCodes: '200',
+        healthyThresholdCount: 2,
+        interval: Duration.seconds(30),
+        path: '/',
+        timeout: Duration.seconds(5),
+        unhealthyThresholdCount: 2,
+      },
+      port: 80,
+      protocol: aws_elasticloadbalancingv2.ApplicationProtocol.HTTP,
+      targetGroupName: 'alb-tg',
+      vpc,
+    });
+
+    // ALBのリスナーを作成する
+    alb.addListener('Listener80', {
+      defaultTargetGroups: [targetGroup],
+      open: true,
+      port: 80,
+    });
+    const sslCert = aws_certificatemanager.Certificate.fromCertificateArn(this, 'Certificate', 'arn:aws:acm:ap-northeast-1:116707747645:certificate/a6024dfc-53ca-412a-916e-b88eb7795945');
+    alb.addListener('Listener443', {
+      certificates: [sslCert],
+      defaultTargetGroups: [targetGroup],
+      open: true,
+      port: 443,
+//      sslPolicy: aws_elasticloadbalancingv2.SslPolicy.FORWARD_SECRECY_TLS12_RES,
+    });
+  }
+}
