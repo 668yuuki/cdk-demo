@@ -1,2 +1,2 @@
 # demo-cdk
-aws-cdk学習用レポジトリ
+aws-cdk学習用リポジトリ
