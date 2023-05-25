@@ -44,20 +44,7 @@ export class CdkDemoCodePipelineStack extends Stack {
       taskDefinition,      
       publicLoadBalancer: true,
     });
-    // const cluster = new aws_ecs.Cluster(this, 'Cluster');
-    // const taskDefinition = new aws_ecs.FargateTaskDefinition(this, 'TaskDef', {
-    //   memoryLimitMiB: 512,
-    //   cpu: 256,
-    // });
-    // taskDefinition.addContainer("WebContainer", {
-    //   image: aws_ecs.ContainerImage.fromEcrRepository(ecrRepository),
-    //   portMappings: [{ containerPort: 8080 }],
-      
-    // });
-    // const demoFargateService = new aws_ecs.FargateService(this, 'SerDemoFargateServicevice', {
-    //   cluster,
-    //   taskDefinition
-    // });
+
     const fromYaml = yaml.parse(`
     version: 0.2
 
@@ -89,10 +76,6 @@ export class CdkDemoCodePipelineStack extends Stack {
     // Deploy Stage
     const deployAction = new aws_codepipeline_actions.EcsDeployAction({
       actionName: "Fargate_Deploy",
-      // service: new aws_ecs.FargateService(this, 'SerDemoFargateServicevice', {
-      //   cluster,
-      //   taskDefinition
-      // }),
       service: demoFargateService.service,
       input: buildOutput,
     });
