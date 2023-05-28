@@ -37,7 +37,6 @@ aws-cdk学習用リポジトリ
     ```
     cdk destroy
     ```
-    * クラスターが削除されないので手動で削除する調査が必要。
 
 ↓cdk作成時のreadme
 # Welcome to your CDK TypeScript project
