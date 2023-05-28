@@ -29,7 +29,6 @@ aws-cdk学習用リポジトリ
 
 1. ECRへのDockerイメージをpush
    * ECRが作成されたら[こちら](https://github.com/668yuuki/springboot-demo#aws-ecr%E3%81%B8%E3%81%AEpush%E6%89%8B%E9%A0%86)よりDockerイメージを作成し、ECRへpush 
-   * 現状はECSのデプロイについてECRにイメージがないとデプロイが完了しないため調査が必要。
    * 強制的にECSのデプロイを完了する方法は[こちら](https://aws.amazon.com/jp/premiumsupport/knowledge-center/ecs-service-stuck-update-status/)
   
 1. codePipelineとfargateのデプロイを実施  
