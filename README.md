@@ -21,10 +21,10 @@ aws-cdk学習用リポジトリ
 
 # デプロイ手順
 
-1. デプロイの実施  
-    プロジェクト(CDK-DEMO)のフォルダにて以下のコマンドを実施。
+1. ECRのデプロイを実施  
+    プロジェクト(CDK-DEMO)のフォルダにて以下のコマンドを実施し、ECRを作成。
     ```
-    cdk deploy
+    cdk destroy CdkDemoEcrStack
     ```
 
 1. ECRへのDockerイメージをpush
@@ -32,6 +32,12 @@ aws-cdk学習用リポジトリ
    * 現状はECSのデプロイについてECRにイメージがないとデプロイが完了しないため調査が必要。
    * 強制的にECSのデプロイを完了する方法は[こちら](https://aws.amazon.com/jp/premiumsupport/knowledge-center/ecs-service-stuck-update-status/)
   
+1. codePipelineとfargateのデプロイを実施  
+    プロジェクト(CDK-DEMO)のフォルダにて以下のコマンドを実施し、codePipelineとfargateを作成。
+    ```
+    cdk destroy CdkDemoCodePipelineStack
+    ```
+
 2. リソースのクリンナップの実施  
     プロジェクト(CDK-DEMO)のフォルダにて以下のコマンドを実施。
     ```
